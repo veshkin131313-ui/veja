@@ -6,3 +6,5 @@ git commit -m "Описание изменений"
 
 # Отправить изменения на удалённый репозиторий
 git push
+
+pipenv install requests
