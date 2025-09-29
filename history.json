@@ -1,0 +1,18 @@
+[
+    {
+        "timestamp": "2025-09-29 19:38:41",
+        "amount": 123.0,
+        "from": "EUR",
+        "to": "USD",
+        "result": 144.19,
+        "decimals": 2
+    },
+    {
+        "timestamp": "2025-09-29 20:30:51",
+        "amount": 3.0,
+        "from": "EUR",
+        "to": "USD",
+        "result": "3.52",
+        "decimals": 2
+    }
+]
