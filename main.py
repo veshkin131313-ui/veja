@@ -1,14 +1,21 @@
-from http.cookiejar import request_path
-from operator import truediv
-import requests
+
+import asyncio
+import aiohttp
 from history import save_record, load_history
 
 # Функция конвертации
-def convert(amount, from_currency, to_currency):
+async def convert_async(session, amount, from_currency, to_currency):
     url = f"https://api.frankfurter.app/latest?amount={amount}&from={from_currency}&to={to_currency}"
-    response = requests.get(url)
-    data = response.json()
-    return data["rates"][to_currency]
+    async with session.get(url) as response:
+        data = await response.json()
+        return data["rates"][to_currency]
+
+# Получаем список валют
+async def get_currencies_async(session):
+    url = "https://api.frankfurter.app/currencies"
+    async with session.get(url) as response:
+        data = await response.json()
+        return sorted(list(data.keys()))
 
 # Функция безопасного ввода валюты
 def input_currency(prompt, currencies, forbidden=None):
@@ -28,87 +35,98 @@ def input_currency(prompt, currencies, forbidden=None):
             continue
         return cur
 
-# Получаем список валют
-def get_currencies():
-    url = "https://api.frankfurter.app/currencies"
-    try:
-        response = requests.get(url)
-        data = response.json()
-        return sorted(list(data.keys()))
-    except Exception as e:
-        raise RuntimeError(f"Ошибка подключения: {e}")
 
-currencies = get_currencies()
+async def main():
+    async with aiohttp.ClientSession() as session:
+        currencies = await get_currencies_async(session)
 
-# Главное меню
-while True:
-    print("\nГлавное меню:")
-    print("1 — Конвертация")
-    print("2 — История")
-    print("3 — Выход")
-    choice = input("Выберите пункт: ").strip()
-
-    if choice == "1":
-        # --- Конвертация ---
-        print("\nНовая конвертация")
-
-        # Красивый вывод валют по 5 в строке
-        print("Доступные валюты:")
-        for i in range(0, len(currencies), 5):
-            print(" | ".join(currencies[i:i + 5]))
-
-        # Ввод суммы
+        #Главное меню
         while True:
-            user_input = input("Сумма (exit — выход): ").strip()
-            if user_input.lower() == "exit":
+            print("\nГлавное меню:")
+            print("1 — Конвертация")
+            print("2 — История")
+            print("3 — Выход")
+            choice = input("Выберите пункт: ").strip()
+
+            if choice == "1":
+                # --- Конвертация ---
+                print("\nНовая конвертация")
+
+                # Красивый вывод валют по 5 в строке
+                print("Доступные валюты:")
+                for i in range(0, len(currencies), 5):
+                    print(" | ".join(currencies[i:i + 5]))
+
+                # Ввод суммы
+                while True:
+                    user_input = input("Сумма (exit — выход): ").strip()
+                    if user_input.lower() == "exit":
+                        print("Выход из программы...")
+                        exit()
+                    try:
+                        amount = float(user_input)
+                        if amount <= 0:
+                            print("Сумма должна быть больше нуля")
+                            continue
+                        break
+                    except ValueError:
+                        print("Нужно ввести число!")
+
+                from_cur = input_currency("Валюта отправки (exit): ", currencies)
+
+                while True:
+                    to_input = input("В какие валюты конвертировать (через запятую, exit — выход): ").strip()
+                    if to_input.lower() == "exit":
+                        print("Выход из программы...")
+                        exit()
+
+                    to_currencies = [cur.strip().upper() for cur in to_input.replace(",", " ").split()]
+                    invalid = [cur for cur in to_currencies if cur not in currencies or cur == from_cur]
+                    if invalid:
+                        print(f"Некорректные валюты: {', '.join(invalid)}. Попробуйте снова.")
+
+                        continue
+                    break
+
+
+                # Выбор кол-ва знаков после запятой
+                while True:
+                    try:
+                        decimals = int(input("Сколько знаков после запятой выводить? (от 1 до 10): "))
+                        if decimals < 1 or decimals > 10:
+                            print("Необходимо ввести число от 1 до 10")
+                            continue
+                        break
+                    except ValueError:
+                        print("Необходимо ввести целое число")
+
+                results = {}
+                for to_cur in to_currencies:
+                    result = await convert_async(session, amount, from_cur, to_cur)
+                    results[to_cur] = result
+
+                for to_cur, value in results.items():
+                    formatted = f"{value:.{decimals}f}".rstrip("0").rstrip(".")
+                    print(f"{amount} {from_cur} = {formatted} {to_cur}")
+                    # Сохраняем каждую конвертацию в историю
+                    save_record(amount, from_cur, to_cur, formatted, decimals)
+
+            elif choice == "2":
+                # --- Просмотр истории ---
+                history = load_history()
+                if not history:
+                    print("\nИстория пуста")
+                else:
+                    print("\nИстория конвертаций:")
+                    for rec in history:
+                        print(f"{rec['timestamp']} — {rec['amount']} {rec['from']} → {rec['to']} = {rec['result']} ({rec['decimals']} знака)")
+
+            elif choice == "3":
                 print("Выход из программы...")
-                exit()
-            try:
-                amount = float(user_input)
-                if amount <= 0:
-                    print("Сумма должна быть больше нуля")
-                    continue
                 break
-            except ValueError:
-                print("Нужно ввести число!")
 
-        # Ввод валют
-        from_cur = input_currency("Валюта отправки (exit): ", currencies)
-        to_cur   = input_currency("Валюта получения (exit): ", currencies, forbidden=from_cur)
+            else:
+                print("Неверный пункт меню")
 
-        # Конвертация
-        result = convert(amount, from_cur, to_cur)
-
-        # Выбор кол-ва знаков после запятой
-        while True:
-            try:
-                decimals = int(input("Сколько знаков после запятой выводить? (от 1 до 10): "))
-                if decimals < 1 or decimals > 10:
-                    print("Необходимо ввести число от 1 до 10")
-                    continue
-                break
-            except ValueError:
-                print("Необходимо ввести целое число")
-
-        formatted_result = f"{result:.{decimals}f}".rstrip("0").rstrip(".")
-        print(f"{amount} {from_cur} = {formatted_result} {to_cur}")
-
-        # Сохраняем запись в историю
-        save_record(amount, from_cur, to_cur, formatted_result, decimals)
-
-    elif choice == "2":
-        # --- Просмотр истории ---
-        history = load_history()
-        if not history:
-            print("\nИстория пуста")
-        else:
-            print("\nИстория конвертаций:")
-            for rec in history:
-                print(f"{rec['timestamp']} — {rec['amount']} {rec['from']} → {rec['to']} = {rec['result']} ({rec['decimals']} знака)")
-
-    elif choice == "3":
-        print("Выход из программы...")
-        break
-
-    else:
-        print("Неверный пункт меню")
+if __name__ == "__main__":
+    asyncio.run(main())

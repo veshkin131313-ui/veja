@@ -14,5 +14,37 @@
         "to": "USD",
         "result": "3.52",
         "decimals": 2
+    },
+    {
+        "timestamp": "2025-09-30 18:46:20",
+        "amount": 300.0,
+        "from": "USD",
+        "to": "EUR",
+        "result": "255.51",
+        "decimals": 2
+    },
+    {
+        "timestamp": "2025-09-30 19:04:31",
+        "amount": 300.0,
+        "from": "EUR",
+        "to": "USD",
+        "result": "352.23",
+        "decimals": 2
+    },
+    {
+        "timestamp": "2025-09-30 19:31:48",
+        "amount": 230.0,
+        "from": "EUR",
+        "to": "USD",
+        "result": "270.04",
+        "decimals": 2
+    },
+    {
+        "timestamp": "2025-09-30 19:31:48",
+        "amount": 230.0,
+        "from": "EUR",
+        "to": "JPY",
+        "result": "39965",
+        "decimals": 2
     }
 ]
