@@ -109,7 +109,7 @@ async def main():
                     formatted = f"{value:.{decimals}f}".rstrip("0").rstrip(".")
                     print(f"{amount} {from_cur} = {formatted} {to_cur}")
                     # Сохраняем каждую конвертацию в историю
-                    save_record(amount, from_cur, to_cur, formatted, decimals)
+                    save_record(amount, from_cur, to_cur, formatted, decimals, clear=False)
 
             elif choice == "2":
                 # --- Просмотр истории ---
@@ -117,9 +117,83 @@ async def main():
                 if not history:
                     print("\nИстория пуста")
                 else:
-                    print("\nИстория конвертаций:")
-                    for rec in history:
-                        print(f"{rec['timestamp']} — {rec['amount']} {rec['from']} → {rec['to']} = {rec['result']} ({rec['decimals']} знака)")
+                    while True:
+                        print("\nИстория:")
+                        print("1 — Вся история")
+                        print("2 — Показать историю по конкретной валюте")
+                        print("3 — Очистить историю")
+                        print("4 — Назад в меню")
+                        sub_choice = input("Выберите пункт: ").strip()
+                        if sub_choice == "1":
+                            for rec in history:
+                                print(f"{rec['timestamp']} — {rec['amount']} {rec['from']} → {rec['to']} = {rec['result']} ({rec['decimals']} знака)")
+
+
+                        elif sub_choice == "2":
+                            while True:
+                                print("1 - По валюте отправки: ")
+                                print("2 - По валюте получения: ")
+                                print("3 - По обеим валютам (отправки и получения): ")
+                                print("4 - Назад в меню: ")
+                                subb_choice = input("Выберите пункт: ").strip()
+                                if subb_choice == "1":
+                                    cur = input("Введите валюту отправки: ").strip().upper()
+                                    filtered = [rec for rec in history if rec['from'] == cur]
+                                    if not filtered:
+                                        print("Нет записей с такой валютой.")
+                                    else:
+                                        for rec in filtered:
+                                            print(
+                                                f"{rec['timestamp']} — {rec['amount']} {rec['from']} → {rec['to']} = {rec['result']} ({rec['decimals']} знака)")
+
+                                elif subb_choice == "2":
+                                    cur = input("Введите валюту получения: ").strip().upper()
+                                    filtered = [rec for rec in history if rec['to'] == cur]
+                                    if not filtered:
+                                        print("Нет записей с такой валютой.")
+                                    else:
+                                        for rec in filtered:
+                                            print(
+                                                f"{rec['timestamp']} — {rec['amount']} {rec['from']} → {rec['to']} = {rec['result']} ({rec['decimals']} знака)")
+
+                                elif subb_choice == "3":
+
+                                    from_cur = input("Введите валлюту отправки: ").strip().upper()
+                                    to_cur = input("Введите валлюту получения: ").strip().upper()
+                                    filtered = [rec for rec in history if
+                                                rec['from'] == from_cur and rec["to"] == to_cur]
+                                    if not filtered:
+                                        print("Нет записей с такой парой валют.")
+                                    else:
+                                        for rec in filtered:
+                                            print(
+                                                f"{rec['timestamp']} — {rec['amount']} {rec['from']} → {rec['to']} = {rec['result']} ({rec['decimals']} знака)")
+
+
+                                elif subb_choice == "4":
+                                    break
+                                else:
+                                    print("Выбран неверный пункт меню")
+
+
+                        elif sub_choice == "3":
+                            while True:
+                                cln_confirm = input("Вы уверены, что хотите удалить всю историю? (да/нет): ").strip().lower()
+                                if cln_confirm == "да":
+                                    save_record(None, None, None, None, None, clear=True)
+                                    print("История успешно очищена!")
+                                    break
+                                elif cln_confirm == "нет":
+                                    print("Очистка истории отменена.")
+                                    break
+                                else:
+                                    print("Необходимо выбрать да/нет")
+
+
+                        elif sub_choice == "4":
+                            break
+                        else:
+                            print("Выбран неверный пункт меню")
 
             elif choice == "3":
                 print("Выход из программы...")

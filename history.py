@@ -5,7 +5,12 @@ import os
 HISTORY_FILE = "history.json"
 
 # Сохранение новой записи
-def save_record(amount, from_cur, to_cur, result, decimals):
+def save_record(amount, from_cur, to_cur, result, decimals, clear=False):
+    if clear:
+        # очистка истории
+        with open(HISTORY_FILE, "w") as f:
+            f.write("[]")
+        return  # выходим из функции
     record = {
         "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "amount": amount,
@@ -13,6 +18,7 @@ def save_record(amount, from_cur, to_cur, result, decimals):
         "to": to_cur,
         "result": result,
         "decimals": decimals
+
     }
 
     # Если файла нет — начинаем с пустого списка

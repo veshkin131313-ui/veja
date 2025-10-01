@@ -1,50 +1,10 @@
 [
     {
-        "timestamp": "2025-09-29 19:38:41",
-        "amount": 123.0,
-        "from": "EUR",
-        "to": "USD",
-        "result": 144.19,
-        "decimals": 2
-    },
-    {
-        "timestamp": "2025-09-29 20:30:51",
-        "amount": 3.0,
-        "from": "EUR",
-        "to": "USD",
-        "result": "3.52",
-        "decimals": 2
-    },
-    {
-        "timestamp": "2025-09-30 18:46:20",
+        "timestamp": "2025-10-01 21:07:16",
         "amount": 300.0,
         "from": "USD",
         "to": "EUR",
-        "result": "255.51",
-        "decimals": 2
-    },
-    {
-        "timestamp": "2025-09-30 19:04:31",
-        "amount": 300.0,
-        "from": "EUR",
-        "to": "USD",
-        "result": "352.23",
-        "decimals": 2
-    },
-    {
-        "timestamp": "2025-09-30 19:31:48",
-        "amount": 230.0,
-        "from": "EUR",
-        "to": "USD",
-        "result": "270.04",
-        "decimals": 2
-    },
-    {
-        "timestamp": "2025-09-30 19:31:48",
-        "amount": 230.0,
-        "from": "EUR",
-        "to": "JPY",
-        "result": "39965",
-        "decimals": 2
+        "result": "255.9",
+        "decimals": 1
     }
 ]
