@@ -1,39 +1,9 @@
 
 import asyncio
 import aiohttp
+from api import convert_async, get_currencies_async
+from utils import input_currency, pluralize_decimals
 from history import save_record, load_history
-
-# Функция конвертации
-async def convert_async(session, amount, from_currency, to_currency):
-    url = f"https://api.frankfurter.app/latest?amount={amount}&from={from_currency}&to={to_currency}"
-    async with session.get(url) as response:
-        data = await response.json()
-        return data["rates"][to_currency]
-
-# Получаем список валют
-async def get_currencies_async(session):
-    url = "https://api.frankfurter.app/currencies"
-    async with session.get(url) as response:
-        data = await response.json()
-        return sorted(list(data.keys()))
-
-# Функция безопасного ввода валюты
-def input_currency(prompt, currencies, forbidden=None):
-    while True:
-        cur = input(prompt).strip().upper()
-        if cur.lower() == "exit":
-            print("Выход из программы...")
-            exit()
-        if len(cur) != 3:
-            print("Код валюты должен состоять из 3 букв")
-            continue
-        if cur not in currencies:
-            print("Такой валюты нет, нужно выбрать другую")
-            continue
-        if forbidden and cur == forbidden:
-            print("Нельзя выбрать ту же валюту")
-            continue
-        return cur
 
 
 async def main():
@@ -120,7 +90,7 @@ async def main():
                     while True:
                         print("\nИстория:")
                         print("1 — Вся история")
-                        print("2 — Показать историю по конкретной валюте")
+                        print("2 — Сортировка истории")
                         print("3 — Очистить историю")
                         print("4 — Назад в меню")
                         sub_choice = input("Выберите пункт: ").strip()
@@ -134,7 +104,8 @@ async def main():
                                 print("1 - По валюте отправки: ")
                                 print("2 - По валюте получения: ")
                                 print("3 - По обеим валютам (отправки и получения): ")
-                                print("4 - Назад в меню: ")
+                                print("4 - По дате и сумме: ")
+                                print("5 - Назад в меню: ")
                                 subb_choice = input("Выберите пункт: ").strip()
                                 if subb_choice == "1":
                                     cur = input("Введите валюту отправки: ").strip().upper()
@@ -169,8 +140,34 @@ async def main():
                                             print(
                                                 f"{rec['timestamp']} — {rec['amount']} {rec['from']} → {rec['to']} = {rec['result']} ({rec['decimals']} знака)")
 
-
                                 elif subb_choice == "4":
+                                    while True:
+                                        print("1 — По дате (старые → новые)")
+                                        print("2 — По дате (новые → старые)")
+                                        print("3 — По сумме (меньше → больше)")
+                                        print("4 — По сумме (больше → меньше)")
+                                        print("5 — Назад")
+
+                                        sort_choice = input("Выберите пункт: ").strip()
+
+                                        if sort_choice == "1":
+                                            sorted_history = sorted(history, key=lambda x: x["timestamp"])
+                                        elif sort_choice == "2":
+                                            sorted_history = sorted(history, key=lambda x: x["timestamp"], reverse=True)
+                                        elif sort_choice == "3":
+                                            sorted_history = sorted(history, key=lambda x: float(x["amount"]))
+                                        elif sort_choice == "4":
+                                            sorted_history = sorted(history, key=lambda x: float(x["amount"]), reverse=True)
+                                        elif sort_choice == "5":
+                                            break
+                                        else:
+                                            print("Неверный пункт меню")
+                                            continue
+
+                                        for rec in sorted_history:
+                                            print(f"{rec['timestamp']} — {rec['amount']} {rec['from']} → "
+                                                  f"{rec['to']} = {rec['result']} ({rec['decimals']} {pluralize_decimals(rec['decimals'])})")
+                                elif subb_choice == "5":
                                     break
                                 else:
                                     print("Выбран неверный пункт меню")
@@ -191,7 +188,7 @@ async def main():
 
 
                         elif sub_choice == "4":
-                            break
+                             break
                         else:
                             print("Выбран неверный пункт меню")
 

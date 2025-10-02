@@ -6,5 +6,61 @@
         "to": "EUR",
         "result": "255.9",
         "decimals": 1
+    },
+    {
+        "timestamp": "2025-10-02 19:50:46",
+        "amount": 200.0,
+        "from": "EUR",
+        "to": "USD",
+        "result": "235.1",
+        "decimals": 1
+    },
+    {
+        "timestamp": "2025-10-02 19:50:46",
+        "amount": 200.0,
+        "from": "EUR",
+        "to": "PHP",
+        "result": "13663",
+        "decimals": 1
+    },
+    {
+        "timestamp": "2025-10-02 19:51:03",
+        "amount": 450.0,
+        "from": "EUR",
+        "to": "USD",
+        "result": "528.9",
+        "decimals": 1
+    },
+    {
+        "timestamp": "2025-10-02 19:51:03",
+        "amount": 450.0,
+        "from": "EUR",
+        "to": "NOK",
+        "result": "5254",
+        "decimals": 1
+    },
+    {
+        "timestamp": "2025-10-02 20:07:52",
+        "amount": 300.0,
+        "from": "USD",
+        "to": "EUR",
+        "result": "255.2",
+        "decimals": 1
+    },
+    {
+        "timestamp": "2025-10-02 20:16:16",
+        "amount": 300.0,
+        "from": "EUR",
+        "to": "USD",
+        "result": "352.6",
+        "decimals": 1
+    },
+    {
+        "timestamp": "2025-10-02 20:31:36",
+        "amount": 300.0,
+        "from": "USD",
+        "to": "EUR",
+        "result": "255.2",
+        "decimals": 1
     }
 ]
