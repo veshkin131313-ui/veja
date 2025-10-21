@@ -1,7 +1,7 @@
 import json
 import datetime
 import os
-from utils import pluralize_decimals
+from app.utils import pluralize_decimals
 
 HISTORY_FILE = "history.json"
 

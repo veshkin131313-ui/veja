@@ -8,6 +8,10 @@ requests = "*"
 uvicorn = "*"
 fastapi = "*"
 aiohttp = "*"
+pymongo = "*"
+beanie = "*"
+pydantic = "*"
+motor = "*"
 
 [dev-packages]
 uvicorn = "*"

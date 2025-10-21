@@ -1,5 +1,5 @@
-from api import convert_async
-from history import save_record
+from app.api import convert_async
+from app.history import save_record
 
 async def convert_amount(session, amount: float, from_cur: str, to_currencies: list[str], decimals: int = 2) -> dict:
     """Конвертация суммы из одной валюты в несколько с сохранением в историю"""

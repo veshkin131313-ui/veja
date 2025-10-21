@@ -1,13 +1,14 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, APIRouter
 import aiohttp
-from converter import convert_amount
-from api import get_currencies_async
-from schemas import ConvertRequest
-from history import load_history, clear_history
+from app.converter import convert_amount
+from app.api import get_currencies_async
+from app.schemas import ConvertRequest
+from app.history import load_history, clear_history
 from fastapi import Query
-app = FastAPI(title="Currency Converter API")
 
-@app.get("/convert")
+router = APIRouter(prefix="/converter", tags=["converter"])\
+
+@router.get("")
 async def convert(
     amount: float = Query(..., gt=0, description="Сумма для конвертации"),
     from_currency: str = Query(..., min_length=3, max_length=3, description="Валюта отправки"),
@@ -37,13 +38,13 @@ async def convert(
         }
 
 # --- История ---
-@app.get("/history")
+@router.get("/history")
 def get_history():
     history = load_history()
     return {"history": history}
 
 # --- Очистка истории ---
-@app.delete("/history")
+@router.delete("/history")
 def delete_history():
     clear_history()
     return {"message": "История очищена"}
