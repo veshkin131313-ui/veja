@@ -1,16 +1,17 @@
 import json
 import datetime
 import os
+from utils import pluralize_decimals
 
 HISTORY_FILE = "history.json"
 
-# Сохранение новой записи
 def save_record(amount, from_cur, to_cur, result, decimals, clear=False):
+    """Сохранение или очистка истории"""
     if clear:
-        # очистка истории
-        with open(HISTORY_FILE, "w") as f:
+        with open(HISTORY_FILE, "w", encoding="utf-8") as f:
             f.write("[]")
-        return  # выходим из функции
+        return
+
     record = {
         "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "amount": amount,
@@ -18,10 +19,8 @@ def save_record(amount, from_cur, to_cur, result, decimals, clear=False):
         "to": to_cur,
         "result": result,
         "decimals": decimals
-
     }
 
-    # Если файла нет — начинаем с пустого списка
     if os.path.exists(HISTORY_FILE):
         with open(HISTORY_FILE, "r", encoding="utf-8") as f:
             try:
@@ -31,21 +30,28 @@ def save_record(amount, from_cur, to_cur, result, decimals, clear=False):
     else:
         history = []
 
-    # Добавляем запись
     history.append(record)
-
-    # Перезаписываем файл
     with open(HISTORY_FILE, "w", encoding="utf-8") as f:
         json.dump(history, f, indent=4, ensure_ascii=False)
 
-
-# Загрузка истории
 def load_history():
+    """Загрузка истории"""
     if not os.path.exists(HISTORY_FILE):
         return []
-
     with open(HISTORY_FILE, "r", encoding="utf-8") as f:
         try:
             return json.load(f)
         except json.JSONDecodeError:
             return []
+
+def show_history(history: list[dict]):
+    """Вывод всей истории"""
+    if not history:
+        print("История пуста")
+        return
+    for rec in history:
+        print(f"{rec['timestamp']} — {rec['amount']} {rec['from']} → {rec['to']} = {rec['result']} ({rec['decimals']} {pluralize_decimals(rec['decimals'])})")
+
+def clear_history():
+    """Очистка истории"""
+    save_record(None, None, None, None, None, clear=True)
